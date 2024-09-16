@@ -3,11 +3,6 @@ package loop;
 public class While1_2 {
     // 반복문 While
     public static void main(String[] args) {
-        /*
-        while (조건식) {
-        코드
-        }
-         */
         int a = 0;
 
         while (a < 3) {
