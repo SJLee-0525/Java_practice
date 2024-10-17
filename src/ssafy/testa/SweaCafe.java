@@ -10,15 +10,13 @@ import java.util.Arrays;
 
 public class SweaCafe {
 
-    private static int N;
-    private static int result;
+    private static int N, result;
 
     private static int[] di = new int[]{1, 1, -1, -1};
     private static int[] dj = new int[]{1, -1, -1, 1};
     private static int[] ate;
 
-    private static int[][] cafeRoad;
-    private static int[][] visited;
+    private static int[][] cafeRoad, visited;
 
 
     public static void main(String[] args) throws IOException {

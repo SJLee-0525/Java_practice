@@ -1,4 +1,4 @@
-// package ssafy.testa;
+package ssafy.testa;
 
 // 메모리 줄이는 거 포기..
 
@@ -13,14 +13,14 @@ import java.util.StringTokenizer;
 
 public class SweaBlock2 {
 
-    private static int N, W, H, result;  // 쏘는 횟수
+    private static int N, W, H, result;
 
     private static int[] di = {1, 0, -1, 0};
     private static int[] dj = {0, 1, 0, -1};
 
     private static int[][] block;
 
-    private static Deque<int[]> stack = new LinkedList<>();
+    private static Deque<Integer> stack = new LinkedList<>();
 
     private static void mainDef(int lv) {
         if (lv == N) {
@@ -34,7 +34,7 @@ public class SweaBlock2 {
                 copyBlock[ci][cj] = block[ci][cj];
             }
         }
-
+        // 한 번이라도 변화가 있었는지 확인용 (벽돌이 하나도 없다면 c가 늘어나지 않을 것)
         int c = 0;
 
         for (int j = 0; j < W; j++) {
@@ -45,6 +45,9 @@ public class SweaBlock2 {
                     bomb(i, j);
                     mainDef(lv + 1);
 
+                    // 복구하는 과정에서 메모리 사용량 늘어나는 게 확실한데
+                    // 이 방법이 아니면 잘 구현이 안 됨
+                    // 바뀐 블록의 좌표들만 arraylist로 담아와서 복구하는 것은 재귀 순서가 꼬이는지 안 됨
                     for (int ci = 0; ci < H; ci++) {
                         for (int cj = 0; cj < W; cj++) {
                             block[ci][cj] = copyBlock[ci][cj];
@@ -55,17 +58,20 @@ public class SweaBlock2 {
                 }
             }
         }
+        copyBlock = null;
+
+        // c가 0이면 벽돌이 다 부서진 거니까 마지막 lv로 바로 이동시켜서 강제 종료 시키면 됨
         if (c == 0) mainDef(N);
     }
 
     private static void bomb(int si, int sj) {
         // 어차피 스택이 다 비어야 탈출하니까, 함수마다 스택을 만들지 말고 재사용해보자
-        stack.push(new int[]{si, sj});
+        stack.push(si);
+        stack.push(sj);
 
         while (!stack.isEmpty()) {
-            int[] now = stack.pop();
-            int i = now[0];
-            int j = now[1];
+            int j = stack.pop();
+            int i = stack.pop();
             int val = block[i][j];
 
             if (val > 1) {
@@ -74,13 +80,15 @@ public class SweaBlock2 {
                         int mi = i + (di[k] * v);
                         int mj = j + (dj[k] * v);
                         if (0 <= mi && mi < H && 0 <= mj && mj < W) {
-                            stack.push(new int[]{mi, mj});
+                            stack.push(mi);
+                            stack.push(mj);
                         }
                     }
                 }
             }
             block[i][j] = 0;
         }
+        stack.clear();
         getDownBlock();
     }
 
@@ -108,7 +116,7 @@ public class SweaBlock2 {
             }
         }
 
-        if (result > cnt) result = cnt;
+        result = Math.min(cnt, result);
     }
 
     public static void main(String[] args) throws IOException {

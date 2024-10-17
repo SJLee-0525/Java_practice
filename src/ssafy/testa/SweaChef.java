@@ -10,59 +10,48 @@ import java.util.StringTokenizer;
 
 public class SweaChef {
 
-    private static int N;
-    private static int result;
-
-    private static int[] used;
+    private static int N, result;
+    private static int[] used, groupA, groupB;
     private static int[][] scoreBoard;
 
-    private static ArrayList<Integer> groupA;
-    private static ArrayList<Integer> groupB;
-
     private static void combi(int lv, int cnt) {
+        if (cnt > N / 2) return;
+
         if (lv == N) {
-            if (cnt == N / 2) {
-                groupA = new ArrayList<>();
-                groupB = new ArrayList<>();
-                for (int i = 0; i < N; i++) {
-                    if (used[i] == 1) {
-                        groupA.add(i);
-                    } else {
-                        groupB.add(i);
-                    }
-                }
-                int resA = calScore(groupA);
-                int resB = calScore(groupB);
-                int temp = Math.abs(resA - resB);
-                if (result > temp) {
-                    result = temp;
-                }
-            }
+            if (cnt == N / 2) result = Math.min(result, calScore());
             return;
         }
-        if (cnt > N / 2) {
-            return;
-        }
+
         used[lv] = 1;
         combi(lv + 1, cnt + 1);
         used[lv] = 0;
         combi(lv + 1, cnt);
     }
 
-    private static int calScore(ArrayList<Integer> inputGroup) {
-        int temp = 0;
+    private static int calScore() {
+        groupA = new int[N / 2];
+        groupB = new int[N / 2];
+
+        int indexA = 0, indexB = 0;
+        for (int i = 0; i < N; i++) {
+            if (used[i] == 1) groupA[indexA++] = i;
+            else groupB[indexB++] = i;
+        }
+
+        int tempA = 0, tempB = 0;
         for (int i = 0; i < N / 2; i++) {
             for (int j = 0; j < N / 2; j++) {
-                temp += scoreBoard[inputGroup.get(i)][inputGroup.get(j)];
-//                temp += scoreBoard[inputGroup.get(j)][inputGroup.get(i)];
+                tempA += scoreBoard[groupA[i]][groupA[j]];
+                tempB += scoreBoard[groupB[i]][groupB[j]];
             }
         }
-        return temp;
+        return Math.abs(tempA - tempB);
     }
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        StringBuilder sb = new StringBuilder();
 
         int T = Integer.parseInt(br.readLine());
         for (int tc = 1; tc <= T; tc++) {
@@ -80,7 +69,6 @@ public class SweaChef {
             result = 10000001;
             combi(0, 0);
 
-            StringBuilder sb = new StringBuilder();
             sb.append('#').append(tc).append(' ').append(result).append('\n');
             bw.write(sb.toString());
             bw.flush();
